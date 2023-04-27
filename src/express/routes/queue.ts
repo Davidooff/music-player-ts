@@ -1,7 +1,6 @@
 import { TypedRequestBody } from "../../../config/types";
-import { Response } from "express";
+import { NextFunction, Response } from "express";
 import { queue, QueueEl } from "../../mongoose/models/queue";
-import { log } from "console";
 
 export const addToQueue = async (
   req: TypedRequestBody<{ id: string; add: QueueEl }>,
@@ -43,4 +42,13 @@ export const getQueue = async (
       return await queue?.getQueue(req.body.start, req.body.end);
     });
   res.send(data);
+};
+
+export const refresh = async (
+  req: TypedRequestBody<{ id: string }>,
+  res: Response,
+  next: NextFunction
+) => {
+  global.io.emit(req.body.id, "refresh");
+  next();
 };

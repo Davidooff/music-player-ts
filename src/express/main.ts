@@ -1,7 +1,9 @@
 import express from "express";
+import http from "http";
+import Socket from "../socket/main";
 import { hello } from "./routes/hello";
 import { login, register, checkRefreshToken } from "./routes/auth";
-import { addToQueue, getQueue, removeFromQueue } from "./routes/queue";
+import { addToQueue, getQueue, refresh, removeFromQueue } from "./routes/queue";
 import {
   useCheckAccessToken,
   addToLibrary,
@@ -13,9 +15,11 @@ import { play } from "./routes/play";
 
 class App {
   public app: express.Application;
-
+  public server: any;
   constructor() {
     this.app = express();
+    this.server = http.createServer(this.app);
+    global.io = new Socket(this.server).io;
     this.config();
     this.routs();
   }
@@ -34,9 +38,10 @@ class App {
     this.app.post("/play", play);
     this.app.post("/getLibrary", getLibrary);
 
+    this.app.use("/queue", refresh);
     this.app.post("/queue/add", addToQueue);
     this.app.post("/queue/remove", removeFromQueue);
-    this.app.post("/queue/get", getQueue);
+    this.app.post("/get/queue", getQueue);
   }
 
   private config(): void {
@@ -49,4 +54,4 @@ class App {
   }
 }
 
-export default new App().app;
+export default new App().server;
