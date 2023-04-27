@@ -57,8 +57,8 @@ export const checkRefreshToken = async (
   req: TypedRequestBody<{ token: string }>,
   res: Response<{ success: boolean; token?: string }>
 ) => {
-  let jwtCookie = jwtService.verify(req.body.token);
-  // let jwtCookie = jwtService.verify(req.cookies.jwt);
+  // let jwtCookie = jwtService.verify(req.body.token);
+  let jwtCookie = jwtService.verify(req.cookies.jwt);
   if (jwtCookie && jwtCookie.ip == req.ip) {
     res.send({
       success: true,
