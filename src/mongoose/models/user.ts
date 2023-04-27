@@ -4,7 +4,9 @@ import jwtService from "../../express/src/jwt";
 import { hashPassword } from "../src/crypt";
 
 interface LoginResponse {
-  token: string;
+  accessToken?: string;
+  refreshToken?: string;
+  success: boolean;
   msg?: string;
 }
 
@@ -23,39 +25,66 @@ const userSchema = new Schema(
   },
   {
     statics: {
-      async auth(login: string, password: string): Promise<LoginResponse> {
+      async auth(
+        login: string,
+        password: string,
+        ip: string
+      ): Promise<LoginResponse> {
         let user = this.findOne({ _id: login }).lean();
-        let token = jwtService.sign({ login }, "1h");
-        let data = await Promise.all([user, token]);
+        let refreshToken = jwtService.sign({ login, ip }, "7d");
+        let accessToken = jwtService.sign({ login }, "10m");
+        let data = await Promise.all([user, refreshToken, accessToken]);
 
         if (data[0]?.password && compareSync(password, data[0].password)) {
           return {
-            token: data[1],
+            refreshToken: data[1],
+            accessToken: data[2],
+            success: true,
           };
         } else {
           return {
-            token: "",
-            msg: "Wrong password",
+            success: false,
           };
         }
       },
-      async register(login: string, password: string): Promise<LoginResponse> {
+      async register(
+        login: string,
+        password: string,
+        ip: string
+      ): Promise<LoginResponse> {
         let user = this.findOne({ _id: login }).lean();
-        let token = jwtService.sign({ login }, "1h");
+        let refreshToken = jwtService.sign({ login, ip }, "7d");
+        let accessToken = jwtService.sign({ login }, "10m");
         let password_hash = hashPassword(password);
         if (await user) {
           return {
-            token: "",
-            msg: "User already registered",
+            success: false,
+            msg: "User already exists",
           };
         } else {
-          let user = this.create({
+          return this.create({
             _id: login,
             password: await password_hash,
-          });
-          return {
-            token: await token,
-          };
+          })
+            .then(async () => {
+              return {
+                success: true,
+                refreshToken: await refreshToken,
+                accessToken: await accessToken,
+              };
+            })
+            .catch(async (err) => {
+              return {
+                success: false,
+                msg: err,
+              };
+            })
+            .finally(() => {
+              return {
+                success: false,
+                msg: "Something went wrong",
+              };
+            });
         }
       },
     },

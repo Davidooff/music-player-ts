@@ -1,6 +1,11 @@
 import jwt from "jsonwebtoken";
 import env from "../../env";
 
+interface JwtPayload {
+  ip?: string;
+  login: string;
+}
+
 class JwtService {
   private privateKey: string;
   constructor() {
@@ -15,8 +20,12 @@ class JwtService {
     return jwt.sign(payload, this.privateKey, { expiresIn });
   }
 
-  verify(token: string) {
-    return jwt.verify(token, this.privateKey);
+  verify(token: string): JwtPayload {
+    try {
+      return jwt.verify(token, this.privateKey) as JwtPayload;
+    } catch (error) {
+      return { login: "" };
+    }
   }
 }
 
