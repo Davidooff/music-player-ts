@@ -7,6 +7,7 @@ import {
   removeFromLibrary,
 } from "./routes/library";
 import cookieparser from "cookie-parser";
+import { play } from "./routes/play";
 
 class App {
   public app: express.Application;
@@ -19,6 +20,7 @@ class App {
 
   private routs(): void {
     this.app.get("/", hello);
+
     this.app.post("/auth/register", register);
     this.app.post("/auth/login", login);
     this.app.post("/auth/refresh", checkRefreshToken);
@@ -26,6 +28,8 @@ class App {
     this.app.use("/library", useCheckAccessToken);
     this.app.post("/library/add", addToLibrary);
     this.app.post("/library/remove", removeFromLibrary);
+
+    this.app.post("/play", play);
   }
 
   private config(): void {

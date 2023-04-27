@@ -1,9 +1,7 @@
-import { TypedRequestBody } from "../../../config/types";
+import { TypedRequestBody, platform } from "../../../config/types";
 import { Response, NextFunction } from "express";
 import User from "../../mongoose/models/user";
 import JWTServices from "../src/jwt";
-
-type platform = "youtube" | "soundcloud" | "spotify";
 
 export const useCheckAccessToken = async (
   req: TypedRequestBody<{ accessToken: string; login?: string }>,

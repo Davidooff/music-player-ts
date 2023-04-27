@@ -5,3 +5,5 @@ export interface TypedRequestBody<T> extends Express.Request {
   ip: string;
   body: T;
 }
+
+export type platform = "youtube" | "soundcloud" | "spotify";
