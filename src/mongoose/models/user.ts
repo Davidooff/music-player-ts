@@ -1,4 +1,4 @@
-import mongoose, { Schema, Types } from "mongoose";
+import mongoose, { Model, Schema, Types } from "mongoose";
 import { compareSync } from "bcryptjs";
 import jwtService from "../../express/src/jwt";
 import { hashPassword } from "../src/crypt";
@@ -10,7 +10,36 @@ interface LoginResponse {
   msg?: string;
 }
 
-const userSchema = new Schema(
+interface IUser {
+  _id: string;
+  password: string;
+  library: [
+    {
+      originalName: string;
+      platform: string;
+      link: string;
+      // _id: Types.ObjectId;
+    }
+  ];
+  date: { type: Date };
+}
+
+// Put all user instance methods in this interface:
+interface IUserMethods {
+  addToLibrary(
+    originalName: string,
+    platform: string,
+    link: string
+  ): Promise<boolean>;
+  removeFromLibrary(id: string): Promise<boolean>;
+}
+
+// Create a new Model type that knows about IUserMethods...
+type UserModel = Model<IUser, {}, IUserMethods>;
+
+// And a schema that knows about IUserMethods
+
+const userSchema = new Schema<IUser, UserModel, IUserMethods>(
   {
     _id: String,
     password: String,
@@ -19,7 +48,6 @@ const userSchema = new Schema(
         originalName: String,
         platform: String,
         link: String,
-        _id: Types.ObjectId,
       },
     ],
     date: { type: Date, default: Date.now },
@@ -89,43 +117,63 @@ const userSchema = new Schema(
         }
       },
     },
-    methods: {
-      async addToLibrary(originalName, platform, link) {
-        return this.updateOne({
-          $push: {
-            library: {
-              originalName,
-              platform,
-              link,
-            },
-          },
-        });
-      },
-      async removeFromLibrary(id) {
-        return this.updateOne({
-          $pull: {
-            library: {
-              _id: id,
-            },
-          },
-        });
-      },
-      async moveInLibrary(id, direction) {
-        let index = this.library.findIndex((e) => e._id == id);
-        let newIndex = direction;
-        if (newIndex < 0) {
-          newIndex = 0;
-        } else if (newIndex > this.library.length - 1) {
-          newIndex = this.library.length - 1;
-        }
-        let tmp = this.library[index];
-        this.library[index] = this.library[newIndex];
-        this.library[newIndex] = tmp;
-        return this.save();
-      },
-    },
+    // methods: {
+    // async moveInLibrary(id, direction) {
+    //   let index = this.library.findIndex((e) => e._id == id);
+    //   let newIndex = direction;
+    //   if (newIndex < 0) {
+    //     newIndex = 0;
+    //   } else if (newIndex > this.library.length - 1) {
+    //     newIndex = this.library.length - 1;
+    //   }
+    //   let tmp = this.library[index];
+    //   this.library[index] = this.library[newIndex];
+    //   this.library[newIndex] = tmp;
+    //   return this.save();
+    // },
+    // },
   }
 );
+
+userSchema.method(
+  "addToLibrary",
+  async function addToLibrary(
+    originalName: string,
+    platform: string,
+    link: string
+  ): Promise<boolean> {
+    try {
+      await this.updateOne({
+        $push: {
+          library: {
+            originalName,
+            platform,
+            link,
+          },
+        },
+      });
+
+      return true;
+    } catch {
+      return false;
+    }
+  }
+);
+
+userSchema.method("removeFromLibrary", async function removeFromLibrary(id) {
+  try {
+    await this.updateOne({
+      $pull: {
+        library: {
+          _id: id,
+        },
+      },
+    });
+    return true;
+  } catch {
+    return false;
+  }
+});
 
 // const userModel = mongoose.model("users", userSchema);
 

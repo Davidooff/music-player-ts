@@ -1,6 +1,11 @@
 import express from "express";
 import { hello } from "./routes/hello";
 import { login, register, checkRefreshToken } from "./routes/auth";
+import {
+  useCheckAccessToken,
+  addToLibrary,
+  removeFromLibrary,
+} from "./routes/library";
 import cookieparser from "cookie-parser";
 
 class App {
@@ -17,6 +22,10 @@ class App {
     this.app.post("/auth/register", register);
     this.app.post("/auth/login", login);
     this.app.post("/auth/refresh", checkRefreshToken);
+
+    this.app.use("/library", useCheckAccessToken);
+    this.app.post("/library/add", addToLibrary);
+    this.app.post("/library/remove", removeFromLibrary);
   }
 
   private config(): void {
