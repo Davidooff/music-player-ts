@@ -57,3 +57,27 @@ export const removeFromLibrary = (
       res.send({ success });
     });
 };
+
+// not using token
+export const getLibrary = async (
+  req: TypedRequestBody<{
+    start?: number;
+    end?: number;
+    login: string;
+  }>,
+  res: Response
+) => {
+  let success: boolean = false;
+  let library = await User.findById(req.body.login)
+    .exec()
+    .then(async (user) => {
+      if (user) {
+        success = true;
+        return await user.getLibrary(req.body.start, req.body.end);
+      } else {
+        success = false;
+        return [];
+      }
+    });
+  res.send({ success, library });
+};

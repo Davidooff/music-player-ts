@@ -1,10 +1,12 @@
 import express from "express";
 import { hello } from "./routes/hello";
 import { login, register, checkRefreshToken } from "./routes/auth";
+import { addToQueue, getQueue, removeFromQueue } from "./routes/queue";
 import {
   useCheckAccessToken,
   addToLibrary,
   removeFromLibrary,
+  getLibrary,
 } from "./routes/library";
 import cookieparser from "cookie-parser";
 import { play } from "./routes/play";
@@ -30,6 +32,11 @@ class App {
     this.app.post("/library/remove", removeFromLibrary);
 
     this.app.post("/play", play);
+    this.app.post("/getLibrary", getLibrary);
+
+    this.app.post("/queue/add", addToQueue);
+    this.app.post("/queue/remove", removeFromQueue);
+    this.app.post("/queue/get", getQueue);
   }
 
   private config(): void {

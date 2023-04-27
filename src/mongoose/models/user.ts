@@ -1,4 +1,4 @@
-import mongoose, { Model, Schema, Types } from "mongoose";
+import mongoose, { Model, Schema } from "mongoose";
 import { compareSync } from "bcryptjs";
 import jwtService from "../../express/src/jwt";
 import { hashPassword } from "../src/crypt";
@@ -10,17 +10,16 @@ interface LoginResponse {
   msg?: string;
 }
 
+interface libraryElement {
+  originalName: string;
+  platform: string;
+  link: string;
+}
+
 interface IUser {
   _id: string;
   password: string;
-  library: [
-    {
-      originalName: string;
-      platform: string;
-      link: string;
-      // _id: Types.ObjectId;
-    }
-  ];
+  library: [libraryElement];
   date: { type: Date };
 }
 
@@ -32,6 +31,10 @@ interface IUserMethods {
     link: string
   ): Promise<boolean>;
   removeFromLibrary(id: string): Promise<boolean>;
+  getLibrary(
+    start: number | undefined,
+    end: number | undefined
+  ): Promise<[libraryElement]>;
 }
 
 // Create a new Model type that knows about IUserMethods...
@@ -173,6 +176,13 @@ userSchema.method("removeFromLibrary", async function removeFromLibrary(id) {
   } catch {
     return false;
   }
+});
+
+userSchema.method("getLibrary", async function getLibrary(start?, end?) {
+  if (typeof start === "number" && typeof end === "number") {
+    return await this.library.slice(start, end);
+  }
+  return await this.library;
 });
 
 // const userModel = mongoose.model("users", userSchema);
