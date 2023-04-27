@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 import { compareSync } from "bcryptjs";
 import jwtService from "../../express/src/jwt";
 import { hashPassword } from "../src/crypt";
@@ -19,6 +19,7 @@ const userSchema = new Schema(
         originalName: String,
         platform: String,
         link: String,
+        _id: Types.ObjectId,
       },
     ],
     date: { type: Date, default: Date.now },
@@ -86,6 +87,41 @@ const userSchema = new Schema(
               };
             });
         }
+      },
+    },
+    methods: {
+      async addToLibrary(originalName, platform, link) {
+        return this.updateOne({
+          $push: {
+            library: {
+              originalName,
+              platform,
+              link,
+            },
+          },
+        });
+      },
+      async removeFromLibrary(id) {
+        return this.updateOne({
+          $pull: {
+            library: {
+              _id: id,
+            },
+          },
+        });
+      },
+      async moveInLibrary(id, direction) {
+        let index = this.library.findIndex((e) => e._id == id);
+        let newIndex = direction;
+        if (newIndex < 0) {
+          newIndex = 0;
+        } else if (newIndex > this.library.length - 1) {
+          newIndex = this.library.length - 1;
+        }
+        let tmp = this.library[index];
+        this.library[index] = this.library[newIndex];
+        this.library[newIndex] = tmp;
+        return this.save();
       },
     },
   }
