@@ -28,6 +28,7 @@ class DiscordBot {
           GatewayIntentBits.Guilds,
           GatewayIntentBits.GuildMessages,
           GatewayIntentBits.DirectMessages,
+          GatewayIntentBits.GuildVoiceStates,
         ],
         partials: [Partials.Channel],
       }),

@@ -1,6 +1,7 @@
 import { TypedRequestBody } from "../../../config/types";
 import { NextFunction, Response } from "express";
 import { queue, QueueEl } from "../../mongoose/models/queue";
+import user from "../../mongoose/models/user";
 
 export const addToQueue = async (
   req: TypedRequestBody<{ id: string; add: QueueEl }>,
@@ -46,9 +47,24 @@ export const getQueue = async (
 
 export const refresh = async (
   req: TypedRequestBody<{ id: string }>,
-  res: Response,
-  next: NextFunction
+  res: Response
 ) => {
   global.io.emit(req.body.id, "refresh");
-  next();
+};
+
+export const addLibToQueue = async (
+  req: TypedRequestBody<{ id: string }>,
+  res: Response
+) => {
+  let add = user.findById(req.body.id).lean();
+  let moveTo = queue.findById(req.body.id).exec();
+  let success = await Promise.all([add, moveTo]).then(async (data) => {
+    if (!data[0] || !data[1]) return false;
+    else {
+      data[1].queue.push(...data[0].library);
+      await data[1].save();
+      return true;
+    }
+  });
+  res.send({ success });
 };

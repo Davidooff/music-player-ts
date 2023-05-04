@@ -12,6 +12,7 @@ import {
 } from "./routes/library";
 import cookieparser from "cookie-parser";
 import { play } from "./routes/play";
+import { skip } from "./routes/player";
 
 class App {
   public app: express.Application;
@@ -38,10 +39,12 @@ class App {
     this.app.post("/play", play);
     this.app.post("/getLibrary", getLibrary);
 
-    this.app.use("/queue", refresh);
+    this.app.use("/queue", refresh); // sending "refresh" by socket.io
     this.app.post("/queue/add", addToQueue);
     this.app.post("/queue/remove", removeFromQueue);
     this.app.post("/get/queue", getQueue);
+
+    this.app.post("/discord/skip", skip);
   }
 
   private config(): void {
