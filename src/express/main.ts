@@ -3,7 +3,13 @@ import http from "http";
 import Socket from "../socket/main";
 import { hello } from "./routes/hello";
 import { login, register, checkRefreshToken } from "./routes/auth";
-import { addToQueue, getQueue, refresh, removeFromQueue } from "./routes/queue";
+import {
+  addLibToQueue,
+  addToQueue,
+  getQueue,
+  refresh,
+  removeFromQueue,
+} from "./routes/queue";
 import {
   useCheckAccessToken,
   addToLibrary,
@@ -12,7 +18,7 @@ import {
 } from "./routes/library";
 import cookieparser from "cookie-parser";
 import { play } from "./routes/play";
-import { skip } from "./routes/player";
+import { skip, start } from "./routes/player";
 
 class App {
   public app: express.Application;
@@ -42,9 +48,11 @@ class App {
     this.app.use("/queue", refresh); // sending "refresh" by socket.io
     this.app.post("/queue/add", addToQueue);
     this.app.post("/queue/remove", removeFromQueue);
+    this.app.post("/queue/addLib", addLibToQueue);
     this.app.post("/get/queue", getQueue);
 
     this.app.post("/discord/skip", skip);
+    this.app.post("/discord/start", start);
   }
 
   private config(): void {

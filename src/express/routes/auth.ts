@@ -10,7 +10,6 @@ export const login = async (
   let data = await db.userModel.auth(req.body.id, req.body.password, req.ip);
   if (data.success) {
     let refreshToken = data.refreshToken;
-    delete data.refreshToken;
     res.cookie("jwt", refreshToken, {
       sameSite: "none", //only dev
       secure: true, //only dev
@@ -19,6 +18,7 @@ export const login = async (
       // sameSite: "strict", // or 'Lax', it depends
       maxAge: 604800000, // 7 days
     });
+    delete data.refreshToken;
     res.send(data);
   } else {
     res.send(data);

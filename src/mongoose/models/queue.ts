@@ -5,6 +5,7 @@ export interface QueueEl {
   link: string;
   platform: string;
   originalName: string;
+  _id?: string;
 }
 
 interface IQueue {

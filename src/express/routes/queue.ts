@@ -47,16 +47,23 @@ export const getQueue = async (
 
 export const refresh = async (
   req: TypedRequestBody<{ id: string }>,
-  res: Response
+  res: Response,
+  next: NextFunction
 ) => {
+  // await queue.findById(req.body.id).then(async (queue) => {
+  //   if (!queue) {
+  //     start(id)
+  //   }
+  // })
   global.io.emit(req.body.id, "refresh");
+  next();
 };
 
 export const addLibToQueue = async (
-  req: TypedRequestBody<{ id: string }>,
+  req: TypedRequestBody<{ id: string; userId: string }>,
   res: Response
 ) => {
-  let add = user.findById(req.body.id).lean();
+  let add = user.findById(req.body.userId).lean();
   let moveTo = queue.findById(req.body.id).exec();
   let success = await Promise.all([add, moveTo]).then(async (data) => {
     if (!data[0] || !data[1]) return false;

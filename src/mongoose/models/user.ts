@@ -88,6 +88,7 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
         let refreshToken = jwtService.sign({ login, ip }, "7d");
         let accessToken = jwtService.sign({ login }, "10m");
         let password_hash = hashPassword(password);
+
         if (await user) {
           return {
             success: false,
