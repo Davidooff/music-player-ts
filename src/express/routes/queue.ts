@@ -39,10 +39,11 @@ export const getQueue = async (
     .findById(req.body.id)
     .exec()
     .then(async (queue) => {
-      // console.log(queue);
       return await queue?.getQueue(req.body.start, req.body.end);
     });
-  res.send(data);
+  if (data) {
+    res.send({ queue: data, success: true });
+  } else res.status(404).send({ success: false });
 };
 
 export const refresh = async (
