@@ -19,6 +19,13 @@ import {
 import cookieparser from "cookie-parser";
 import { play } from "./routes/play";
 import { skip, start } from "./routes/player";
+import cors from "cors";
+
+var corsOptions = {
+  origin: "*",
+  methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
 
 class App {
   public app: express.Application;
@@ -60,6 +67,8 @@ class App {
     this.app.use(express.json());
     // suport using cookies
     this.app.use(cookieparser());
+
+    this.app.use(cors(corsOptions));
     // accepting proxy for checking ip
     this.app.enable("trust proxy");
   }

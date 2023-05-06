@@ -1,26 +1,33 @@
 import { getVoiceConnection, createAudioPlayer } from "@discordjs/voice";
 import createAudio from "./createAudio";
-import { queue } from "../../../mongoose/models/queue";
+import { queueModel } from "../../../mongoose/models/queue";
 import ended from "../../events/player/ended";
+import embed from "./embed";
 
-export default async function (id: string) {
+export default async function (id: string): Promise<boolean> {
   const connection = getVoiceConnection(id);
   if (connection) {
-    await queue.findById(id).then(async (data) => {
+    let queueData = await queueModel.findById(id).then(async (data) => {
       data?.queue.shift();
       await data?.save();
+      return data;
     });
-    const player = createAudioPlayer();
+
     const audio = await createAudio(id);
-    if (audio) {
+    if (audio instanceof Error) {
+      const player = createAudioPlayer();
       connection.subscribe(player);
       player.play(audio);
+      await embed(audio.metadata, id, queueData?.msgId, queueData?.channelId);
       player.addListener("stateChange", (oldOne, newOne) => {
         if (newOne.status == "idle") {
-          console.log("ended");
           ended(id, player);
         }
       });
+      io.emit(id, "skip");
+      return true;
+    } else {
+      return false;
     }
-  }
+  } else return false;
 }

@@ -10,6 +10,8 @@ export interface QueueEl {
 
 interface IQueue {
   _id: string;
+  msgId: string;
+  channelId: string;
   queue: [QueueEl];
 }
 
@@ -21,7 +23,7 @@ interface IQueueMethods {
     link: string
   ): Promise<boolean>;
   removeFromQueue(id: string): Promise<boolean>;
-  getFirstAndDelete(): Promise<{ next?: QueueEl; success: boolean }>;
+  getFirst(): Promise<{ next?: QueueEl; success: boolean }>;
   getQueue(
     start: number | undefined,
     end: number | undefined
@@ -33,6 +35,8 @@ type QueueModel = Model<IQueue, {}, IQueueMethods>;
 
 const queueSchema = new Schema<IQueue, QueueModel, IQueueMethods>({
   _id: String,
+  msgId: String,
+  channelId: String,
   queue: [
     {
       link: String,
@@ -72,13 +76,12 @@ queueSchema.method("removeFromQueue", async function (id: string) {
   }
 });
 
-queueSchema.method("getFirstAndDelete", async function () {
+queueSchema.method("getFirst", async function (this: any): Promise<{
+  next?: QueueEl;
+  success: boolean;
+}> {
   try {
-    const queue: any = this.queue;
-    const next = queue.shift();
-    this.queue = queue;
-    await this.save();
-    return { next, success: true };
+    return { next: this.queue[0], success: true };
   } catch {
     return { success: false };
   }
@@ -91,4 +94,4 @@ queueSchema.method("getQueue", async function (start, end) {
   return await this.queue;
 });
 
-export const queue = mongoose.model("queue", queueSchema);
+export const queueModel = mongoose.model("queue", queueSchema);

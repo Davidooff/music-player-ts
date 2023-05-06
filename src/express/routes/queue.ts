@@ -1,49 +1,51 @@
 import { TypedRequestBody } from "../../../config/types";
 import { NextFunction, Response } from "express";
-import { queue, QueueEl } from "../../mongoose/models/queue";
+import { queueModel, QueueEl } from "../../mongoose/models/queue";
 import user from "../../mongoose/models/user";
 
 export const addToQueue = async (
   req: TypedRequestBody<{ id: string; add: QueueEl }>,
   res: Response
 ) => {
-  let success = await queue
+  let success = await queueModel
     .findById(req.body.id)
     .exec()
     .then(async (queue) => {
-      if (!queue) return res.send({ success: false, error: "No queue found" });
+      if (!queue) return res.status(404).send({ error: "No queue found" });
       return await queue.addToQueue(
         req.body.add.originalName,
         req.body.add.platform,
         req.body.add.link
       );
     });
-  res.send({ success });
+  res.send();
 };
 
 export const removeFromQueue = async (
   req: TypedRequestBody<{ id: string; itemId: string }>,
   res: Response
 ) => {
-  let success = await queue.findById(req.body.id).then(async (queue) => {
+  let success = await queueModel.findById(req.body.id).then(async (queue) => {
     return await queue?.removeFromQueue(req.body.itemId);
   });
-  res.send({ success });
+  if (success) {
+    res.send();
+  } else res.status(404).send();
 };
 
 export const getQueue = async (
   req: TypedRequestBody<{ id: string; start?: number; end?: number }>,
   res: Response
 ) => {
-  let data = await queue
+  let data = await queueModel
     .findById(req.body.id)
     .exec()
     .then(async (queue) => {
       return await queue?.getQueue(req.body.start, req.body.end);
     });
   if (data) {
-    res.send({ queue: data, success: true });
-  } else res.status(404).send({ success: false });
+    res.send({ queue: data });
+  } else res.status(404).send();
 };
 
 export const refresh = async (
@@ -65,7 +67,7 @@ export const addLibToQueue = async (
   res: Response
 ) => {
   let add = user.findById(req.body.userId).lean();
-  let moveTo = queue.findById(req.body.id).exec();
+  let moveTo = queueModel.findById(req.body.id).exec();
   let success = await Promise.all([add, moveTo]).then(async (data) => {
     if (!data[0] || !data[1]) return false;
     else {
@@ -74,5 +76,5 @@ export const addLibToQueue = async (
       return true;
     }
   });
-  res.send({ success });
+  res.status(200).send();
 };

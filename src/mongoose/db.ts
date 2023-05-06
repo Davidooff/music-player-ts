@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 import userModel from "./models/user";
 import env from "../env";
-import { queue } from "./models/queue";
+import { queueModel } from "./models/queue";
 
 class DB {
   private static mongoose = mongoose.connect(env.DB_URL);
   public userModel = userModel;
-  public queueModel = queue;
+  public queueModel = queueModel;
   constructor() {
     this.init();
   }

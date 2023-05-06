@@ -1,6 +1,7 @@
 import { getVoiceConnection, createAudioPlayer } from "@discordjs/voice";
-import { queue, QueueEl } from "../../../mongoose/models/queue";
+import { queueModel, QueueEl } from "../../../mongoose/models/queue";
 import createAudio from "../../commands/src/createAudio";
+import embed from "../../commands/src/embed";
 
 export default async function ended(
   this: void,
@@ -9,13 +10,15 @@ export default async function ended(
 ): Promise<void> {
   const connection = getVoiceConnection(id);
   if (connection) {
-    await queue.findById(id).then(async (data) => {
+    let queueData = await queueModel.findById(id).then(async (data) => {
       data?.queue.shift();
       await data?.save();
+      return data;
     });
     const audio = await createAudio(id);
     if (audio) {
       player.play(audio);
+      await embed(audio.metadata, id, queueData?.msgId, queueData?.channelId);
       io.emit(id, "skip");
     }
   }
