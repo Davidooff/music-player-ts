@@ -1,5 +1,6 @@
 import express from "express";
 import http from "http";
+import Socket from "../socket/main";
 import { hello } from "./routes/hello";
 import { login, register, checkRefreshToken } from "./routes/auth";
 import {
@@ -32,7 +33,7 @@ class App {
   constructor() {
     this.app = express();
     this.server = http.createServer(this.app);
-    global.io = require("socket.io")(this.server, corsOptions).io;
+    global.io = new Socket(this.server).io;
     this.config();
     this.routs();
   }
