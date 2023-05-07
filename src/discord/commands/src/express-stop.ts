@@ -5,8 +5,8 @@ import ended from "../../events/player/ended";
 export default async function (id: string) {
   let player = global.client.players.get(id);
   if (player) {
-    player.unpause();
-    io.emit(id, "unpause");
+    player.pause();
+    io.emit(id, "pause");
     return true;
   } else return false;
 }

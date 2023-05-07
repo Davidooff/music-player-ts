@@ -10,6 +10,7 @@ import deployComands from "./deploy-commands";
 import ApplicationCommand from "./templates/ApplicationCommand";
 import env from "../env";
 import Event from "./templates/Envent";
+import { AudioPlayer } from "@discordjs/voice";
 
 class DiscordBot {
   public deploy!: boolean;
@@ -34,6 +35,7 @@ class DiscordBot {
       }),
       {
         commands: new Collection<string, ApplicationCommand>(),
+        players: new Collection<string, AudioPlayer>(),
       }
     );
 

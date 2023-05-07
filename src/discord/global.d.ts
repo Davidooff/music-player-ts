@@ -1,9 +1,11 @@
 import { Client, Collection } from "discord.js";
 import ApplicationCommand from "../templates/ApplicationCommand";
 import MessageCommand from "../templates/MessageCommand";
+import { AudioPlayer } from "@discordjs/voice";
 
 interface DiscordClient extends Client {
   commands: Collection<string, ApplicationCommand>;
+  players: Collection<string, AudioPlayer>;
 }
 
 declare global {

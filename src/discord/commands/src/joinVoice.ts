@@ -2,8 +2,9 @@ import {
   joinVoiceChannel,
   getVoiceConnection,
   createAudioPlayer,
+  AudioPlayer,
 } from "@discordjs/voice";
-import { VoiceBasedChannel } from "discord.js";
+import { Collection, VoiceBasedChannel } from "discord.js";
 import { queueModel, QueueEl } from "../../../mongoose/models/queue";
 import user from "../../../mongoose/models/user";
 import createAudio from "./createAudio";
@@ -57,6 +58,8 @@ export default async function (
     let audio = await createAudio(guildId);
     if (audio) {
       let player = createAudioPlayer();
+
+      global.client.players.set(guildId, player);
       connection.subscribe(player);
       player.play(audio);
       player.addListener("stateChange", (oldOne, newOne) => {
