@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "./css/login.scss";
+import useAxios from "axios-hooks";
 
 function Login() {
   return (
@@ -17,9 +18,20 @@ function Login() {
 function Form() {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
-  console.log(login, password);
+
+  const [{ data, loading, error }, refetch] = useAxios('http://localhost:3000/auth/register', {
+    manual: true
+  });
+
+  const submitAction = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+  };
+
   return (
-    <form className="login--form">
+    <form 
+      className="login--form"
+      onSubmit={submitAction}
+    >
       <Input isPassword={false} setInput={setLogin}></Input>
       <Input isPassword={true} setInput={setPassword}></Input>
       <div className="form-btns">
