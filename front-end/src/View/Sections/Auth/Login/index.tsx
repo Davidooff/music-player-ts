@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import "./css/login.scss";
-import useAxios from "axios-hooks";
+import { useAuthLogin } from "../../../../Api/Auth/useAuthLogin";
 
 function Login() {
   return (
@@ -21,7 +21,23 @@ function Form() {
 
   const submitAction = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    loginFetch();
   };
+
+  const { loginResponse, loginLoading, loginError, loginFetch } = useAuthLogin({
+    id: login,
+    password
+  });
+
+  useEffect(() => {
+    if (loginError) {
+      console.log(loginError);
+    }
+
+    if (loginResponse) {
+      console.log(loginResponse);
+    }
+  }, [loginResponse, loginError]);
 
   return (
     <form 
@@ -31,8 +47,18 @@ function Form() {
       <Input isPassword={false} setInput={setLogin}></Input>
       <Input isPassword={true} setInput={setPassword}></Input>
       <div className="form-btns">
-        <button className="login-btn btn">Log in</button>
-        <button className="register-btn btn">Sign up</button>
+        <button 
+          className="login-btn btn"
+          type="submit"
+        >
+            Log in
+        </button>
+        <button 
+          className="register-btn btn" 
+          type="submit"
+        >
+          Sign up
+        </button>
       </div>
     </form>
   );
