@@ -19,10 +19,6 @@ function Form() {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
 
-  const [{ data, loading, error }, refetch] = useAxios('http://localhost:3000/auth/register', {
-    manual: true
-  });
-
   const submitAction = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   };
