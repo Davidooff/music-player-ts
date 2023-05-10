@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import "./css/login.scss";
-import { useAuthLogin } from "../../../../Api/Auth/useAuthLogin";
+import axiosAuth from "../../../../Api/Auth/useAuth.ts";
+import useAxios from "../../../../Api/useAixos";
 
 function Login() {
   return (
@@ -21,44 +22,29 @@ function Form() {
 
   const submitAction = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    loginFetch();
+
+    const [data, error, loading] = useAxios({
+      axiosInstance: axiosAuth,
+      method: "GET",
+      url: "/auth/login",
+      requestConfig: {
+        data: { id: login, password },
+      },
+    });
+    console.log(data);
   };
 
-  const { loginResponse, loginLoading, loginError, loginFetch } = useAuthLogin({
-    id: login,
-    password
-  });
-
-  useEffect(() => {
-    if (loginError) {
-      console.log(loginError);
-    }
-
-    if (loginResponse) {
-      console.log(loginResponse);
-    }
-  }, [loginResponse, loginError]);
-
   return (
-    <form 
-      className="login--form"
-      onSubmit={submitAction}
-    >
+    <form className="login--form" onSubmit={submitAction}>
       <Input isPassword={false} setInput={setLogin}></Input>
       <Input isPassword={true} setInput={setPassword}></Input>
       <div className="form-btns">
-        <button 
-          className="login-btn btn"
-          type="submit"
-        >
-            Log in
+        <button className="login-btn btn" type="submit">
+          Log in
         </button>
-        <button 
-          className="register-btn btn" 
-          type="submit"
-        >
+        {/* <button className="register-btn btn" type="submit">
           Sign up
-        </button>
+        </button> */}
       </div>
     </form>
   );
