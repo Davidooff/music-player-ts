@@ -12,7 +12,7 @@ export const login = async (
     let refreshToken = data.refreshToken;
     res.cookie("jwt", refreshToken, {
       sameSite: "none", //only dev
-      secure: true, //only dev
+      secure: false, //only dev
       // httpOnly: true,
       // secure: true,
       // sameSite: "strict", // or 'Lax', it depends
@@ -46,7 +46,7 @@ export const register = async (
       // sameSite: "strict", // or 'Lax', it depends
       maxAge: 604800000, // 7 days
     });
-    delete data.refreshToken;
+    // delete data.refreshToken;
     res.send(data);
   } else {
     res.send(data);
