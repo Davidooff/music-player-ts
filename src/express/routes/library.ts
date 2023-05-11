@@ -63,12 +63,12 @@ export const getLibrary = async (
   req: TypedRequestBody<{
     start?: number;
     end?: number;
-    login: string;
+    id: string;
   }>,
   res: Response
 ) => {
   let success: boolean = false;
-  let library = await User.findById(req.body.login)
+  let library = await User.findById(req.body.id)
     .exec()
     .then(async (user) => {
       if (user) {
@@ -79,5 +79,5 @@ export const getLibrary = async (
         return [];
       }
     });
-  res.send({ success, library });
+  res.status(success ? 200 : 404).send({ library });
 };

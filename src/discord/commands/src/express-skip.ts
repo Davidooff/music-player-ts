@@ -14,7 +14,7 @@ export default async function (id: string): Promise<boolean> {
     });
 
     const audio = await createAudio(id);
-    if (audio instanceof Error) {
+    if (audio) {
       const player = createAudioPlayer();
       connection.subscribe(player);
       player.play(audio);

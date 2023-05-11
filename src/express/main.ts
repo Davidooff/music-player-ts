@@ -18,7 +18,7 @@ import {
 } from "./routes/library";
 import cookieparser from "cookie-parser";
 import { play } from "./routes/play";
-import { skip, start } from "./routes/player";
+import { skip, start, stop } from "./routes/player";
 import cors from "cors";
 
 var corsOptions = {
@@ -50,7 +50,7 @@ class App {
     this.app.post("/library/remove", removeFromLibrary);
 
     this.app.post("/play", play);
-    this.app.post("/getLibrary", getLibrary);
+    this.app.post("/get/library", getLibrary);
 
     this.app.use("/queue", refresh); // sending "refresh" by socket.io
     this.app.post("/queue/add", addToQueue);
@@ -59,6 +59,7 @@ class App {
     this.app.post("/get/queue", getQueue);
 
     this.app.post("/discord/skip", skip);
+    this.app.post("/discord/stop", stop);
     this.app.post("/discord/start", start);
   }
 

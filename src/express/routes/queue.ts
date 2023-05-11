@@ -11,7 +11,7 @@ export const addToQueue = async (
     .findById(req.body.id)
     .exec()
     .then(async (queue) => {
-      if (!queue) return res.status(404).send({ error: "No queue found" });
+      if (!queue) return res.status(404).send({ msg: "No queue found" });
       return await queue.addToQueue(
         req.body.add.originalName,
         req.body.add.platform,

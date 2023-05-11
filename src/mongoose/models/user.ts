@@ -11,6 +11,7 @@ interface LoginResponse {
 }
 
 interface libraryElement {
+  _id?: string;
   originalName: string;
   platform: string;
   link: string;
